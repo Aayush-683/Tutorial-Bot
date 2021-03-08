@@ -10,7 +10,7 @@ bot.on("ready", () => {
 
 bot.on("message", message => {
     if(message.author.bot) return;
-    if (message.content.indexOF(PREFIX) !== 0) return;
+    if (message.content.indexOf(PREFIX) !== 0) return;
 
     const args = message.content.slice(PREFIX.length).trim().split(/ +/g);
     const cmd = args.shift().toLowerCase()
@@ -18,13 +18,14 @@ bot.on("message", message => {
             const helpEmbed = new Discord.MessageEmbed()
                     .setTitle(`${bot.user.username}'s Help Menu`)
                     .setDescription(`**PREFIX - \`${PREFIX}\`**`)
-                    .addFeild("`ping`", "Check my latency to discord servers :D")
-                    .addFeild("`kick`", `Kick someone for being disgracefull\n**Usage: ${PREFIX}kick [@USER] <REASON>`)
-                    .addFeild("`ban`", `Ban someone for being naughty\n**Usage: ${PREFIX}ban [@USER] <REASON>`)
-                    .addFeild("`add`", `Add a role to a user\n**Usage: ${PREFIX}add [@USER] [ROLE]`)
-                    .addFeild("`remove`", `Remove a role from a user\n**Usage: ${PREFIX}remove [@USER] [ROLE]`)
-                    .addFeild("`purge`", `Delete messages in bulk and be lazy :P\n**Usage: ${PREFIX}purge [AMOUNT]`)
-                    .addFeild("`rps`", `A fun rps command lel\n**Usage: ${PREFIX}rps [rock / paper / scissors]`)
+                    .addField("`ping`", "Check my latency to discord servers :D")
+                    .addField("`kick`", `Kick someone for being disgracefull\n**Usage: ${PREFIX}kick [@USER] <REASON>**`)
+                    .addField("`ban`", `Ban someone for being naughty\n**Usage: ${PREFIX}ban [@USER] <REASON>**`)
+                    .addField("`add`", `Add a role to a user\n**Usage: ${PREFIX}add [@USER] [ROLE]**`)
+                    .addField("`remove`", `Remove a role from a user\n**Usage: ${PREFIX}remove [@USER] [ROLE]**`)
+                    .addField("`purge`", `Delete messages in bulk and be lazy :P\n**Usage: ${PREFIX}purge [AMOUNT]**`)
+                    .addField("`rps`", `A fun rps command lel\n**Usage: ${PREFIX}rps [rock / paper / scissors]**`)
+            message.channel.send(helpEmbed)
         }
 
         if (cmd === "ping") {
@@ -58,6 +59,7 @@ bot.on("message", message => {
 
                 if(reason) return member.ban(reason).then(member => {message.channel.send(`**${member.user.tag} was kicked**\n> Reason - \`${reason}\``);
             })
+          }
         }
 
         if (cmd === "add") {
@@ -66,7 +68,7 @@ bot.on("message", message => {
             if (!member) return message.channel.send("You need to mention someone :/").then(msg => msg.delete({ timeout : 10000}))
             const add = args.slice(1).join(" ")
             if (!add) return message.channel.send("You didn't gimme a role lol").then(msg => msg.delete({ timeout : 10000}))
-            const roleADD = message.guild.roles.cache.find(role => rolename === add)
+            const roleADD = message.guild.roles.cache.find(role => role.name === add)
             if (!roleADD) return message.channel.send(`A role called \`${add}\` doesn't exists!`).then(msg => msg.delete({ timeout : 10000}))
             if (member.roles.cache.get(roleADD.id)) return message.channel.send("User already has that role ;/").then(msg => msg.delete({ timeout : 10000}))
             member.roles.add(roleADD).then(member => {
@@ -80,7 +82,7 @@ bot.on("message", message => {
             if (!member) return message.channel.send("You need to mention someone :/").then(msg => msg.delete({ timeout : 10000}))
             const add = args.slice(1).join(" ")
             if (!add) return message.channel.send("You didn't gimme a role lol").then(msg => msg.delete({ timeout : 10000}))
-            const roleADD = message.guild.roles.cache.find(role => rolename === add)
+            const roleADD = message.guild.roles.cache.find(role => role.name === add)
             if (!roleADD) return message.channel.send(`A role called \`${add}\` doesn't exists!`).then(msg => msg.delete({ timeout : 10000}))
             if (!member.roles.cache.get(roleADD.id)) return message.channel.send("User doesn't have that role either ways ;/").then(msg => msg.delete({ timeout : 10000}))
             member.roles.remove(roleADD).then(member => {
@@ -97,43 +99,40 @@ bot.on("message", message => {
         }
 
         if (cmd === "rps") {
-            const options = [
-                "rock :shell:",
-                "paper :paper:",
-                "scissors :scissors:"
+            const choice = [
+                "rock",
+                "paper",
+                "scissors"
             ]
-            const choice = args.join(" ")
-            const result = options[Math.floor(Math.random() * options.length)]
-            if (choice !== "rock" || choice !== "paper" || choice !== "scissors") return message.channel.send(`You didn't choose anything :/`)
-            if (choice === result) {
-                message.delete()
-                return message.channel.send("**Its a draw!**")
-            }
-            if(choice === "rock" && result === "paper") {
-                message.delete()
-                return message.channel.send("**Omg.. You won!**")
-            }
-            if(choice === "paper" && result === "scissors") {
-                message.delete()
-                return message.channel.send("**Omg.. You won!**")
-            }
-            if(choice === "scissors" && result === "rock") {
-                message.delete()
-                return message.channel.send("**Omg.. You won!**")
-            }
-            if(choice === "rock" && result === "scissors") {
-                message.delete()
-                return message.channel.send("**Ayy! i won!**")
-            }
-            if(choice === "paper" && result === "rock") {
-                message.delete()
-                return message.channel.send("**Ayy! i won!**")
-            }
-            if(choice === "scissors" && result === "paper") {
-                message.delete()
-                return message.channel.send("**Ayy! i won!**")
-            }
+            const msg2 = args.join(" ");
+            const res = choice[Math.floor(Math.random() * choice.length)]
+
+            let msg = msg2.toLowerCase().trim()
+
+            if(msg === "rock" || msg === "paper" || msg === "scissor") {
+
+            var first = "You choosed " + msg + " and i choosed " + res + " so, "
+
+            var second;
+
+            if(msg === res) second = "its a Draw:neutral_face:!!"
+
+            else if(msg === "scissor" && res === "paper") second ="l lose :pensive:"
+
+            else if(msg === "paper" && res === "rock") second = "l lose :confused:"
+
+            else if(msg === "rock" && res === "scissor") second = "l lose :tired_face:"
+
+            else second = "I won :smirk: "
+
+            reply = first + second
+
+        } else{
+
+          reply = `You did not choosed any options :/\n**Usage: ${PREFIX}rps [rock / paper / scissors]**`
         }
-     
-        }
+
+        message.channel.send(`${reply}`)
+      }
+    
 })
